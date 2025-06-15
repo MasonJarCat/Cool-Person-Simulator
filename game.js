@@ -63,6 +63,18 @@ class CoolDadGame {
                 baseCost: 2500,
                 description: 'Carrying the team to victory!',
                 unlockThreshold: 5000
+            },
+            {
+                id: 'enhance',
+                name: 'Enhance Coolness',
+                icon: '✨',
+                baseRate: 0,
+                currentRate: 0,
+                level: 0,
+                cost: 10000,
+                baseCost: 10000,
+                description: '2x multiplier for ALL activities!',
+                unlockThreshold: 25000
             }
         ];
         
@@ -108,15 +120,29 @@ class CoolDadGame {
             }
         });
         
-        visibleActivities.forEach(activity => {
+                        visibleActivities.forEach(activity => {
             const card = document.createElement('div');
             card.className = 'activity-card';
-            card.innerHTML = `
-                <div class="activity-header">
-                    <div class="activity-icon">${activity.icon}</div>
-                    <div class="activity-title">${activity.name}</div>
-                </div>
-                <div class="activity-stats">
+            
+            // Special display for Enhance Coolness
+            let statsHTML = '';
+            if (activity.id === 'enhance') {
+                const multiplier = activity.level > 0 ? Math.pow(2, activity.level) : 1;
+                statsHTML = `
+                    <div class="stat-row">
+                        <span>Level:</span>
+                        <span>${activity.level}</span>
+                    </div>
+                    <div class="stat-row">
+                        <span>Current Multiplier:</span>
+                        <span>${multiplier}x</span>
+                    </div>
+                    <div class="stat-row">
+                        <span>${activity.description}</span>
+                    </div>
+                `;
+            } else {
+                statsHTML = `
                     <div class="stat-row">
                         <span>Level:</span>
                         <span>${activity.level}</span>
@@ -128,6 +154,16 @@ class CoolDadGame {
                     <div class="stat-row">
                         <span>${activity.description}</span>
                     </div>
+                `;
+            }
+            
+            card.innerHTML = `
+                <div class="activity-header">
+                    <div class="activity-icon">${activity.icon}</div>
+                    <div class="activity-title">${activity.name}</div>
+                </div>
+                <div class="activity-stats">
+                    ${statsHTML}
                 </div>
                 <button class="upgrade-btn" data-activity-id="${activity.id}" 
                         ${this.coolPoints < activity.cost ? 'disabled' : ''}>
@@ -210,18 +246,51 @@ class CoolDadGame {
         this.coolPoints -= activity.cost;
         activity.level++;
         
-        // For activities that are just being unlocked (level 0 -> 1)
-        if (activity.level === 1) {
-            activity.currentRate = activity.baseRate * (1 + this.prestigeLevel * 0.5);
+        // Special handling for Enhance Coolness
+        if (activity.id === 'enhance') {
+            activity.currentRate = 0; // Doesn't generate points directly
+            activity.cost = Math.floor(activity.baseCost * Math.pow(2, activity.level - 1));
+            // Recalculate all other activities when enhance is upgraded
+            this.recalculateAllActivities();
         } else {
-            activity.currentRate = activity.baseRate * activity.level * (1 + this.prestigeLevel * 0.5);
+            // For regular activities
+            if (activity.level === 1) {
+                activity.currentRate = activity.baseRate * (1 + this.prestigeLevel * 0.5);
+            } else {
+                activity.currentRate = activity.baseRate * activity.level * (1 + this.prestigeLevel * 0.5);
+            }
+            
+            // Apply enhance coolness multiplier
+            const enhanceActivity = this.activities.find(a => a.id === 'enhance');
+            if (enhanceActivity && enhanceActivity.level > 0) {
+                activity.currentRate *= Math.pow(2, enhanceActivity.level);
+            }
+            
+            activity.cost = Math.floor(activity.baseCost * Math.pow(1.5, activity.level - 1));
         }
-        
-        activity.cost = Math.floor(activity.baseCost * Math.pow(1.5, activity.level - 1));
         
         // Force immediate re-render after purchase
         this.renderActivities();
         this.saveGame();
+    }
+    
+    recalculateAllActivities() {
+        const enhanceActivity = this.activities.find(a => a.id === 'enhance');
+        const enhanceMultiplier = enhanceActivity ? Math.pow(2, enhanceActivity.level) : 1;
+        
+        this.activities.forEach(activity => {
+            if (activity.id !== 'enhance' && activity.level > 0) {
+                // Recalculate base rate with prestige bonus
+                if (activity.level === 1) {
+                    activity.currentRate = activity.baseRate * (1 + this.prestigeLevel * 0.5);
+                } else {
+                    activity.currentRate = activity.baseRate * activity.level * (1 + this.prestigeLevel * 0.5);
+                }
+                
+                // Apply enhance multiplier
+                activity.currentRate *= enhanceMultiplier;
+            }
+        });
     }
     
     startGameLoop() {
@@ -302,6 +371,9 @@ class CoolDadGame {
             }
             activity.cost = activity.baseCost;
         });
+        
+        // Recalculate all activities to ensure proper multipliers
+        this.recalculateAllActivities();
         
         this.saveGame();
         this.renderActivities();
