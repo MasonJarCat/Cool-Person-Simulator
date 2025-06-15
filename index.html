@@ -73,6 +73,7 @@
             padding: 20px;
             backdrop-filter: blur(5px);
             border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.2s ease;
         }
         
         .activity-card:hover {
@@ -116,6 +117,8 @@
             font-weight: bold;
             cursor: pointer;
             font-size: 1em;
+            transition: all 0.2s ease;
+            user-select: none;
         }
         
         .upgrade-btn:hover:not(:disabled) {
@@ -336,7 +339,7 @@
                                 <span>${activity.description}</span>
                             </div>
                         </div>
-                        <button class="upgrade-btn" onclick="game.upgradeActivity('${activity.id}')" 
+                        <button class="upgrade-btn" data-activity-id="${activity.id}" 
                                 ${this.coolPoints < activity.cost ? 'disabled' : ''}>
                             Upgrade - ${this.formatNumber(activity.cost)} cool points
                         </button>
@@ -483,6 +486,16 @@
             
             setupEventListeners() {
                 document.getElementById('prestigeBtn').addEventListener('click', () => this.prestige());
+                
+                // Add event delegation for upgrade buttons
+                document.getElementById('activitiesGrid').addEventListener('click', (e) => {
+                    if (e.target.classList.contains('upgrade-btn') && !e.target.disabled) {
+                        const activityId = e.target.getAttribute('data-activity-id');
+                        if (activityId) {
+                            this.upgradeActivity(activityId);
+                        }
+                    }
+                });
             }
             
             formatNumber(num) {
@@ -515,7 +528,7 @@
                         this.unlockedActivities = new Set(data.unlockedActivities);
                     } else {
                         // For backward compatibility with old saves
-                        this.unlockedActivities = new Set(['walks']);
+                        this.unlockedActivities = new Set(['cool']);
                         this.activities.forEach(activity => {
                             if (activity.level > 0 || this.coolPoints >= activity.unlockThreshold) {
                                 this.unlockedActivities.add(activity.id);
