@@ -379,8 +379,7 @@ class CoolDadGame {
         this.renderActivities();
         this.perstigeCost = this.perstigeCost * 2; // Double the cost for next prestige
         // show a congratulatory message that shows the true identity of the player which is Dad
-        alert('your true identity, that is the peak of coolness, is Dad!');
-        alert(`🌟 Congratulations! You've ascended to Legend Level ${this.prestigeLevel}! 🌟\nAll activities now generate ${((this.prestigeLevel * 0.5 + 1) * 100).toFixed(0)}% more cool points!`);
+        alert(`your true identity, that is the peak of coolness, is Dad! \n 🌟 Congratulations! You've ascended to Legend Level ${this.prestigeLevel}! 🌟\nAll activities now generate ${((this.prestigeLevel * 0.5 + 1) * 100).toFixed(0)}% more cool points!`);
     }
     
     setupEventListeners() {
