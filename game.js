@@ -305,6 +305,7 @@ class CoolDadGame {
             
             this.coolPoints += totalRate / 10; // 10 updates per second
             this.updateDisplay();
+            this.needsButtonUpdate();
         }, 100);
     }
     
