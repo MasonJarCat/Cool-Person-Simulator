@@ -13,7 +13,23 @@
             min-height: 100vh;
             color: white;
         }
-        
+        .activity-card.enhance-card {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 165, 0, 0.2));
+            border: 2px solid rgba(255, 215, 0, 0.6);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+        }
+
+        .activity-card.enhance-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 30px rgba(255, 215, 0, 0.4);
+        }
+
+        .enhance-multiplier {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #FFD700;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+        }
         .game-container {
             max-width: 1200px;
             margin: 0 auto;
@@ -202,8 +218,12 @@
         <div class="prestige-section">
             <h3>🌟 Ascend to Legend Status 🌟</h3>
             <p>Reach 1,000,000 cool points to unlock your true identity!</p>
-            <button class="prestige-btn" id="prestigeBtn" disabled>Become a Legend (Requires 1M points)</button>
+            <button class="prestige-btn" id="prestigeBtn" disabled>Become a Legend</button>
             <p id="prestigeLevel">Legend Level: 0</p>
+        </div>
+
+        <div class="notes">
+            this game is not balanced lmao and is mainly a fun little gift 
         </div>
     </div>
 

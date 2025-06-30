@@ -2,6 +2,7 @@ class CoolDadGame {
     constructor() {
         this.coolPoints = 0;
         this.prestigeLevel = 0;
+        this.perstigeCost = 1000000; // Cost to prestige
         this.unlockedActivities = new Set(['cool']); // Track permanently unlocked activities
         this.activities = [
             {
@@ -75,7 +76,7 @@ class CoolDadGame {
                 baseCost: 10000,
                 description: '2x multiplier for ALL activities!',
                 unlockThreshold: 25000
-            }
+            },
         ];
         
         this.coolLevels = [
@@ -91,7 +92,6 @@ class CoolDadGame {
             { threshold: 100000, title: "Mythical Cool Person" },
             { threshold: 250000, title: "Godlike Cool Person" },
             { threshold: 500000, title: "Transcendent Cool Person" },
-            { threshold: 1000000, title: "Wait... you're just Dad!" }
         ];
         
         this.init();
@@ -353,7 +353,7 @@ class CoolDadGame {
     }
     
     prestige() {
-        if (this.coolPoints < 1000000) return;
+        if (this.coolPoints < this.perstigeCost) return;
         
         this.prestigeLevel++;
         this.coolPoints = 0;
@@ -377,7 +377,9 @@ class CoolDadGame {
         
         this.saveGame();
         this.renderActivities();
-        
+        this.perstigeCost = this.perstigeCost * 2; // Double the cost for next prestige
+        // show a congratulatory message that shows the true identity of the player which is Dad
+        alert('your true identity, that is the peak of coolness, is Dad!');
         alert(`🌟 Congratulations! You've ascended to Legend Level ${this.prestigeLevel}! 🌟\nAll activities now generate ${((this.prestigeLevel * 0.5 + 1) * 100).toFixed(0)}% more cool points!`);
     }
     
